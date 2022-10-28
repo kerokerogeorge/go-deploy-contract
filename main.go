@@ -6,20 +6,26 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"os"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/joho/godotenv"
 	storage "github.com/kerokerogeorge/go-deploy-smartcontract/contracts"
 )
 
 func main() {
-	client, err := ethclient.Dial("https://eth-goerli.g.alchemy.com/v2/b3-8tyI0X58hzWaRBudDw8fwZe83ugsJ")
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal(err)
+	}
+	client, err := ethclient.Dial(os.Getenv("URL"))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	privateKey, err := crypto.HexToECDSA("d33172bdb1848eb8b571e3043bf0d7e2bd37dc0c63cbfa6488be3021270e1fb3")
+	privateKey, err := crypto.HexToECDSA(os.Getenv("PRIVATE_KEY"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -50,7 +56,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// auth := bind.NewKeyedTransactor(privateKey)
 	auth.Nonce = big.NewInt(int64(nonce))
 	auth.Value = big.NewInt(0)     // in wei
 	auth.GasLimit = uint64(300000) // in units
