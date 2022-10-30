@@ -10,18 +10,22 @@ import (
 	storage "github.com/kerokerogeorge/go-deploy-smartcontract/contracts"
 )
 
-func LoadSmartContract() {
+func QueryingMoodContract() {
 	client, err := ethclient.Dial(os.Getenv("URL"))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	address := common.HexToAddress("0x06f447ce56C6cE7C40F20EFf118dB6Bb4fa60148")
+	address := common.HexToAddress("0xee32E4fD377bd797D8DAd5e42cb3ee3Aba681288")
 	instance, err := storage.NewStorage(address, client)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("contract is loaded")
-	_ = instance
+	value, err := instance.GetMood(nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(value)
 }

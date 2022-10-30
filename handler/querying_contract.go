@@ -7,15 +7,10 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/joho/godotenv"
 	storage "github.com/kerokerogeorge/go-deploy-smartcontract/contracts"
 )
 
 func QueryingSmartContract() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal(err)
-	}
 	client, err := ethclient.Dial(os.Getenv("URL"))
 	if err != nil {
 		log.Fatal(err)

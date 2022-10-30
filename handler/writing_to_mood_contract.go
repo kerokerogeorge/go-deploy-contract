@@ -14,22 +14,11 @@ import (
 	storage "github.com/kerokerogeorge/go-deploy-smartcontract/contracts"
 )
 
-func WritingToSmartContract() {
+func WritingToMoodSmartContract() {
 	client, err := ethclient.Dial(os.Getenv("URL"))
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// address := common.HexToAddress("0x06f447ce56C6cE7C40F20EFf118dB6Bb4fa60148")
-	// instance, err := storage.NewStorage(address, client)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// value, err := instance.Retrieve(nil)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
 
 	privateKey, err := crypto.HexToECDSA(os.Getenv("PRIVATE_KEY"))
 	if err != nil {
@@ -56,30 +45,34 @@ func WritingToSmartContract() {
 	if err != nil {
 		log.Println(err)
 	}
+	// コントラクトアドレス
+	address := common.HexToAddress("0xee32E4fD377bd797D8DAd5e42cb3ee3Aba681288")
+
+	gasTipCap, err := client.SuggestGasTipCap(context.Background())
+	if err != nil {
+		log.Println(err)
+	}
+
+	if err != nil {
+		log.Fatal(err)
+	}
 	auth, err := bind.NewKeyedTransactorWithChainID(privateKey, chainID)
 	if err != nil {
 		log.Fatal(err)
 	}
 	auth.Nonce = big.NewInt(int64(nonce))
-	auth.Value = big.NewInt(0)     // in wei
-	auth.GasLimit = uint64(300000) // in units
+	auth.Value = big.NewInt(0)
+	auth.GasLimit = 300000
 	auth.GasPrice = gasPrice
+	auth.GasTipCap = gasTipCap
 
-	address := common.HexToAddress("0x06f447ce56C6cE7C40F20EFf118dB6Bb4fa60148")
 	instance, err := storage.NewStorage(address, client)
 	if err != nil {
 		log.Fatal(err)
 	}
-	value := big.NewInt(5)
-	log.Println("Value:", value)
-	tx, err := instance.Store(auth, value)
+	tx, err := instance.SetMood(auth, "sign from transaction")
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("tx sent: %s", tx.Hash().Hex()) // tx sent:
-	result, err := instance.Retrieve(nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println("result", result)
+	log.Printf("tx sent: %s", tx.Hash().Hex())
 }
