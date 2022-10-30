@@ -14,7 +14,7 @@ import (
 	storage "github.com/kerokerogeorge/go-deploy-smartcontract/contracts"
 )
 
-func Deploy() {
+func DeployTestContract() {
 	client, err := ethclient.Dial(os.Getenv("URL"))
 	if err != nil {
 		log.Fatal(err)
@@ -41,11 +41,13 @@ func Deploy() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Println("gasPrice: ", gasPrice)
 
 	chainID, err := client.NetworkID(context.Background())
 	if err != nil {
 		log.Println(err)
 	}
+	log.Println("chainID: ", chainID)
 	auth, err := bind.NewKeyedTransactorWithChainID(privateKey, chainID)
 	if err != nil {
 		log.Fatal(err)
@@ -53,15 +55,15 @@ func Deploy() {
 
 	auth.Nonce = big.NewInt(int64(nonce))
 	auth.Value = big.NewInt(0)     // in wei
-	auth.GasLimit = uint64(300000) // in units
+	auth.GasLimit = uint64(700000) // in units
 	auth.GasPrice = gasPrice
 
 	address, tx, instance, err := storage.DeployStorage(auth, client)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(address.Hex())   // ==> 0x06f447ce56C6cE7C40F20EFf118dB6Bb4fa60148
-	fmt.Println(tx.Hash().Hex()) // ==> 0x40ccf618ebacaf3f0b7587f62e1f434bc05303f9e7100ed85c58b914256eb12d
+	fmt.Println(address.Hex())   // ==> 0xfD52a79fEe7CE6C2B08A7736b7C9ea69d90CB7B3
+	fmt.Println(tx.Hash().Hex()) // ==> 0x027b465df1c1a21ce54275270cb2e4b94554bf9bd2c381c1d8d551ced1e5d5f4
 
 	_ = instance
 }
